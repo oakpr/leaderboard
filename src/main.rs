@@ -13,8 +13,8 @@ use rocket::{
 };
 use rocket_dyn_templates::{context, Template};
 use rustbreak::{deser::Ron, PathDatabase};
-
-type Db = PathDatabase<HashMap<String, HashMap<String, u64>>, Ron>;
+type Leaderboard = HashMap<String, HashMap<String, u64>>;
+type Db = PathDatabase<Leaderboard, Ron>;
 
 #[launch]
 fn rocket() -> _ {
@@ -23,7 +23,10 @@ fn rocket() -> _ {
 			Db::load_from_path_or_default("./db".parse().unwrap())
 				.expect("Failed to init database"),
 		)
-		.mount("/", routes![home_page, put_score, score_page, css])
+		.mount(
+			"/",
+			routes![home_page, put_score, score_page, css, get_board],
+		)
 		.attach(Template::fairing())
 }
 
@@ -66,7 +69,7 @@ fn score_page(game: String, count: Option<usize>, db: &State<Db>) -> Template {
 }
 
 #[post("/<game>/<player>/<score>?<increment>")]
-async fn put_score(
+fn put_score(
 	game: String,
 	player: String,
 	score: u64,
@@ -85,6 +88,11 @@ async fn put_score(
 	})
 	.expect("Failed to insert to db");
 	db.save().expect("Failed to write db");
+}
+
+#[get("/<game>/board.json")]
+fn get_board(game: String, db: &State<Db>) -> Json<Leaderboard> {
+	db.read(|db| Json(db.clone())).expect("Failed to read db")
 }
 
 #[get("/index.css")]
