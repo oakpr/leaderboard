@@ -1,9 +1,10 @@
+#![allow(clippy::let_unit_value)]
+#![allow(clippy::needless_pass_by_value)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::no_effect_underscore_binding)]
 #[macro_use]
 extern crate rocket;
-use std::{
-	collections::HashMap,
-	sync::{Arc, RwLock},
-};
+use std::collections::HashMap;
 
 use rocket::{
 	http::Status,
@@ -69,6 +70,7 @@ fn score_page(game: String, count: Option<usize>, db: &State<Db>) -> Template {
 }
 
 #[post("/<game>/<player>/<score>?<increment>")]
+#[allow(clippy::needless_pass_by_value)]
 fn put_score(
 	game: String,
 	player: String,
@@ -91,9 +93,9 @@ fn put_score(
 }
 
 #[get("/<game>/board.json?<top>")]
-fn get_board(game: String, db: &State<Db>, top: Option<usize>) -> Json<HashMap<String, u64>> {
+fn get_board(game: &str, db: &State<Db>, top: Option<usize>) -> Json<HashMap<String, u64>> {
 	db.read(|db| {
-		if let Some(game) = db.get(&game) {
+		if let Some(game) = db.get(game) {
 			if let Some(top) = top {
 				let mut scores: Vec<(String, u64)> = game.clone().into_iter().collect();
 				scores.sort_by(|(_, a), (_, b)| (*b).cmp(a));
