@@ -90,9 +90,23 @@ fn put_score(
 	db.save().expect("Failed to write db");
 }
 
-#[get("/<game>/board.json")]
-fn get_board(game: String, db: &State<Db>) -> Json<Leaderboard> {
-	db.read(|db| Json(db.clone())).expect("Failed to read db")
+#[get("/<game>/board.json?<top>")]
+fn get_board(game: String, db: &State<Db>, top: Option<usize>) -> Json<HashMap<String, u64>> {
+	db.read(|db| {
+		if let Some(game) = db.get(&game) {
+			if let Some(top) = top {
+				let mut scores: Vec<(String, u64)> = game.clone().into_iter().collect();
+				scores.sort_by(|(_, a), (_, b)| (*b).cmp(a));
+				let scores = scores.into_iter().take(top).collect();
+				Json(scores)
+			} else {
+				Json(game.clone())
+			}
+		} else {
+			Json(HashMap::new())
+		}
+	})
+	.expect("Failed to read db")
 }
 
 #[get("/index.css")]
