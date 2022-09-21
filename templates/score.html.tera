@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ game | capitalize }} Leaderboard</title>
+	<link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+	<h1>Scores for {{ game | capitalize }}</h1>
+	<ol>
+		{% for score in scores %}
+		<li><b>{{ score.0 | upper }}</b> - {{ score.1 }}</li>
+		{% endfor %}
+	</ol>
+
+	{% if more %}
+	<a href="?count={{ count + 10 }}">More</a>
+	{% endif %}
+</body>
+
+</html>

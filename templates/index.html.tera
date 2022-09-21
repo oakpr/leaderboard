@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Oakton Leaderboard</title>
+	<link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+	<h1>Work-in-progress Oakton leaderboard tracker thing</h1>
+	<ul>
+		{% for game in games %}
+		<li><a href="./{{ game }}">{{ game | capitalize }}</a></li>
+		{%- endfor %}
+	</ul>
+</body>
+
+</html>
